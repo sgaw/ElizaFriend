@@ -12,6 +12,8 @@ public interface IFeed {
         int getFeedSize();
         FeedItem getFeedItem(int position);
         void blockResponse();
+
+        String getElizaMessage();
     }
 
     interface IView {

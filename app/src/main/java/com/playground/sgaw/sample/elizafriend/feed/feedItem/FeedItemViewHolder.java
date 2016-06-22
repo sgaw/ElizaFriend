@@ -23,7 +23,7 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder implements IFeed
     public void bindItem(FeedItem item) {
         txtItem.setText(item.message);
         if (item.sender == 0) {
-            txtItem.setBackgroundResource(R.color.colorPrimaryDark);
+            txtItem.setBackgroundResource(android.R.color.background_light);
         } else {
             txtItem.setBackgroundResource(R.color.colorAccent);
         }

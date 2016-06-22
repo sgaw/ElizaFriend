@@ -1,25 +1,42 @@
 package com.playground.sgaw.sample.elizafriend.feed;
 
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Process;
 import android.support.v4.util.CircularArray;
 
 import com.playground.sgaw.sample.elizafriend.feed.feedItem.FeedItem;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by sgaw on 18/06/16.
  */
 
 public class FeedDataProvider implements IFeed.IDataProvider {
+    private static final String [] ELIZA_MESSAGES = {
+            "What other reasons might there be?",
+            "Are you sure?",
+            "Do you really think so?",
+            "I see.",
+            "Hmm...",
+            "Yeah, I could see how that happens.",
+            "Yeah, maybe...",
+            "I understand.",
+            "What does that suggest to you?",
+            "Can you elaborate on that?",
+            "That is quite interesting.",
+            "Have you thought about it from the other person's perspective?",
+            "I can see this has upset you. Do you want to talk about it some more?",
+            "Sounds like you wanted a big change in that situation...",
+            "Could you summarize this experience?",
+            "So it sounds like maybe you were a little unhappy about all that."
+    };
     private IFeed.IPresenter presenter;
     private CircularArray<FeedItem> feedArray = new CircularArray<>();
-    private Handler handler = null;
+    private final Handler handler;
 
     public FeedDataProvider() {
+        handler = new Handler();
     }
 
     public void setPresenter(IFeed.IPresenter presenter) {
@@ -32,8 +49,8 @@ public class FeedDataProvider implements IFeed.IDataProvider {
         feedArray.addLast(feedItem);
         if (presenter != null) {
             presenter.postFeedItem();
-            handler = new Handler();
-            handler.postDelayed(new PostElizaRunnable(this), 1000);
+
+            handler.postDelayed(new PostElizaRunnable(this), (int) (1000 + Math.random() * 5000));
         }
     }
 
@@ -52,6 +69,19 @@ public class FeedDataProvider implements IFeed.IDataProvider {
         handler.removeCallbacksAndMessages(null);
     }
 
+    @Override
+    public String getElizaMessage() {
+        return ELIZA_MESSAGES[(int) (Math.random() * ELIZA_MESSAGES.length)];
+    }
+
+    private void postElizaMessage() {
+        FeedItem feedItem = new FeedItem(getElizaMessage(), 0);
+        feedArray.addLast(feedItem);
+        if (presenter != null) {
+            presenter.postFeedItem();
+        }
+    }
+
     private static class PostElizaRunnable implements Runnable {
         private final WeakReference<FeedDataProvider> dataProviderRef;
 
@@ -66,11 +96,4 @@ public class FeedDataProvider implements IFeed.IDataProvider {
         }
     }
 
-    private void postElizaMessage() {
-        FeedItem feedItem = new FeedItem("Eliza here", 0);
-        feedArray.addLast(feedItem);
-        if (presenter != null) {
-            presenter.postFeedItem();
-        }
-    }
 }
