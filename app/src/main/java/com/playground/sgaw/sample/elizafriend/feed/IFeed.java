@@ -13,7 +13,7 @@ public interface IFeed {
         FeedItem getFeedItem(int position);
         void blockResponse();
 
-        String getElizaMessage();
+        String getElizaMessage(FeedDataProvider.Sentiment sentiment);
     }
 
     interface IView {

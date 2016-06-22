@@ -13,6 +13,13 @@ import java.lang.ref.WeakReference;
  */
 
 public class FeedDataProvider implements IFeed.IDataProvider {
+    private static final String [] GREETINGS = {
+            "hello",
+            "hi",
+            "hey",
+            "heya"
+    };
+
     private static final String [] ELIZA_MESSAGES = {
             "What other reasons might there be?",
             "Are you sure?",
@@ -50,8 +57,18 @@ public class FeedDataProvider implements IFeed.IDataProvider {
         if (presenter != null) {
             presenter.postFeedItem();
 
-            handler.postDelayed(new PostElizaRunnable(this), (int) (1000 + Math.random() * 5000));
+            handler.postDelayed(new PostElizaRunnable(this, getSentiment(message)),
+                    (int) (1000 + Math.random() * 5000));
         }
+    }
+
+    private Sentiment getSentiment(String message) {
+        for (Sentiment sentiment: Sentiment.values()) {
+            if (sentiment.isMatch(message)) {
+                return sentiment;
+            }
+        }
+        return Sentiment.NEUTRAL;
     }
 
     @Override
@@ -70,29 +87,68 @@ public class FeedDataProvider implements IFeed.IDataProvider {
     }
 
     @Override
-    public String getElizaMessage() {
+    public String getElizaMessage(Sentiment sentiment) {
+        if (Sentiment.GREETING == sentiment) {
+            return "Hello!  How are you today? What would you like to discuss?";
+        }
         return ELIZA_MESSAGES[(int) (Math.random() * ELIZA_MESSAGES.length)];
     }
 
-    private void postElizaMessage() {
-        FeedItem feedItem = new FeedItem(getElizaMessage(), 0);
+    private void postElizaMessage(Sentiment sentiment) {
+        String elizaMessage = getElizaMessage(sentiment);
+        postElizaMessage(elizaMessage);
+    }
+
+    private void postElizaMessage(String elizaMessage) {
+        FeedItem feedItem = new FeedItem(elizaMessage, 0);
         feedArray.addLast(feedItem);
         if (presenter != null) {
             presenter.postFeedItem();
         }
     }
 
+    enum Sentiment {
+        GREETING {
+            @Override
+            boolean isMatch(String message) {
+                String[] tokens = message.toLowerCase().split("[,\\s]");
+                for (int tokenI = 0; tokenI < tokens.length; tokenI++) {
+                    String token = tokens[tokenI];
+                    if (token.isEmpty()) {
+                        continue;
+                    }
+                    for (int greetingsI = 0; greetingsI < GREETINGS.length; greetingsI++) {
+                        if (token.equals(GREETINGS[greetingsI])) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        },
+        NEUTRAL {
+            @Override
+            boolean isMatch(String message) {
+                return false; // TODO(sgaw): refactor this
+            }
+        };
+
+        abstract boolean isMatch(String message);
+    }
+
     private static class PostElizaRunnable implements Runnable {
         private final WeakReference<FeedDataProvider> dataProviderRef;
+        private final Sentiment sentiment;
 
-        PostElizaRunnable(FeedDataProvider dataProvider) {
+        PostElizaRunnable(FeedDataProvider dataProvider, Sentiment sentiment) {
             this.dataProviderRef = new WeakReference<>(dataProvider);
+            this.sentiment = sentiment;
         }
 
         @Override
         public void run() {
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-            dataProviderRef.get().postElizaMessage();
+            dataProviderRef.get().postElizaMessage(sentiment);
         }
     }
 
