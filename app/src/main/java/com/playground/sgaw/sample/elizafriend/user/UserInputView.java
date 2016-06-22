@@ -2,20 +2,24 @@ package com.playground.sgaw.sample.elizafriend.user;
 
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 /**
  * View for user input.
  */
-public class UserInputView implements IUserInput.IView, View.OnClickListener, View.OnKeyListener {
+public class UserInputView implements IUserInput.IView, View.OnClickListener, TextView.OnEditorActionListener {
     private final EditText txtUserInput;
     private IUserInput.IPresenter presenter;
 
     public UserInputView(ImageButton btnSend, final EditText txtUserInput) {
         this.txtUserInput = txtUserInput;
+        txtUserInput.setOnEditorActionListener(this);
+
         btnSend.setOnClickListener(this);
-        txtUserInput.setOnKeyListener(this);
+
     }
 
     public void setPresenter(IUserInput.IPresenter presenter) {
@@ -38,9 +42,9 @@ public class UserInputView implements IUserInput.IView, View.OnClickListener, Vi
     }
 
     @Override
-    public boolean onKey(View view, int i, KeyEvent keyEvent) {
-        if (keyEvent.getAction() == KeyEvent.ACTION_UP
-            && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+        if (actionId == EditorInfo.IME_ACTION_DONE ||
+                (keyEvent != null && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
             presenter.postMessage();
             return true;
         } else {

@@ -9,6 +9,8 @@
     tools:context="com.playground.sgaw.sample.elizafriend.MainActivity">
 
     <EditText
+        android:imeOptions="actionDone"
+        android:inputType="textShortMessage"
         android:layout_width="wrap_content"
         android:background="@android:color/darker_gray"
         android:layout_height="wrap_content"
