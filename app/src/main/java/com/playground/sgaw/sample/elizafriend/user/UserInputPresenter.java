@@ -26,4 +26,9 @@ public class UserInputPresenter implements IUserInput.IPresenter {
             feed.postUserMessage(message.trim());
         }
     }
+
+    @Override
+    public void blockResponse() {
+        feed.blockResponse();
+    }
 }

@@ -43,6 +43,8 @@ public class UserInputView implements IUserInput.IView, View.OnClickListener, Vi
             && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
             presenter.postMessage();
             return true;
+        } else {
+            presenter.blockResponse();
         }
         return false;
     }

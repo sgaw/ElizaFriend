@@ -13,5 +13,6 @@ public interface IUserInput {
 
     interface IPresenter {
         void postMessage();
+        void blockResponse();
     }
 }

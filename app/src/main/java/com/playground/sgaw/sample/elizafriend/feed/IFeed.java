@@ -11,6 +11,7 @@ public interface IFeed {
         void postUserMessage(String message);
         int getFeedSize();
         FeedItem getFeedItem(int position);
+        void blockResponse();
     }
 
     interface IView {
